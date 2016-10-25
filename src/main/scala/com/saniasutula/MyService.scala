@@ -1,11 +1,12 @@
 package com.saniasutula
 
 import akka.actor.Actor
-import com.saniasutula.auth.{Authenticator, UserDao}
+import com.saniasutula.auth.{Authenticator, User, UserDao}
 import spray.http.MediaTypes._
-import spray.http.StatusCodes._
+import spray.http.StatusCodes
 import spray.routing.HttpService
-import spray.routing.directives._
+
+import scala.util.{Failure, Success}
 
 
 class MyServiceActor extends Actor with MyService {
@@ -42,8 +43,12 @@ trait MyService extends HttpService with Authenticator {
       post {
         formFields('email.as[String], 'pass.as[String]) { (email, pass) =>
           val createFuture = UserDao.createUser(email, pass)
-          onSuccess(createFuture) { user => complete(s"User ${user.email} was successfully created") }
-          onFailure(OnFailureFutureMagnet(createFuture)) {e => complete(Conflict, e.getMessage)}
+          onComplete(createFuture) {
+            case Success(user: User) =>
+              complete(s"User ${user.email} was successfully created")
+            case Failure(e: Exception) =>
+              complete(StatusCodes.Conflict, StatusCodes.Conflict.defaultMessage)
+          }
         }
       } ~ get {
         complete(s"${Mongo.collection.find().toList.mkString("\n\n")}")
