@@ -25,46 +25,52 @@ trait MyService extends HttpService with Authenticator {
       get {
         respondWithMediaType(`text/html`) {
           complete {
-            <html>
-              <body>
-                <h1>Say hello to
-                  <i>spray-routing</i>
-                  on
-                  <i>spray-can</i>
-                  !</h1>
-              </body>
-            </html>
+            com.saniasutula.html.index.render.toString
+          }
+        }
+      }
+    } ~ path("sign-up") {
+      get {
+        respondWithMediaType(`text/html`) {
+          complete {
+            com.saniasutula.html.signUp.render.toString
           }
         }
       }
     } ~ path("secured") {
-      authenticate(basicUserAuthenticator) { userInfo =>
-        complete(s"The user is '${userInfo.user.email}'")
+      get {
+        authenticate(basicUserAuthenticator) { userInfo =>
+          complete(s"The user is '${userInfo.user.email}'")
+        }
       }
     } ~ path("users") {
       post {
-        formFields('email.as[String], 'pass.as[String]) { (email, pass) =>
-          val createFuture = UserDao.createUser(email, pass)
-          onComplete(createFuture) {
-            case Success(user: User) =>
-              complete(s"User ${user.email} was successfully created")
-            case Failure(e: Throwable) =>
-              complete(StatusCodes.Conflict, StatusCodes.Conflict.defaultMessage)
+        formFields('email.as[String], 'password.as[String], 'confirmPassword.as[String]) { (email, pass, cp) =>
+          if (pass != cp) {
+            complete(StatusCodes.BadRequest, "Passwords don't matches")
+          } else {
+            val createFuture = UserDao.createUser(email, pass)
+            onComplete(createFuture) {
+              case Success(user: User) =>
+                complete(s"User ${user.email} was successfully created")
+              case Failure(e: Throwable) =>
+                complete(StatusCodes.Conflict, StatusCodes.Conflict.defaultMessage)
+            }
           }
         }
       } ~ get {
         complete(s"${Mongo.collection.find().toList.mkString("\n\n")}")
       }
-    } ~ path("login") {
+    } ~ path("facebook_fetch") {
       get {
         parameter('code.as[String]) {
           code =>
             val pipeline: HttpRequest => Future[HttpResponse] = sendReceive
             val response: Future[HttpResponse] = pipeline(Get(
               "https://graph.facebook.com/oauth/access_token" +
-                "?client_id=1143682429056274" +
-                "&redirect_uri=http://ce5f7db3.ngrok.io/login" +
-                "&client_secret=8da071cfe1e38c1cb5cbfea9e1d97127" +
+                s"?client_id=${ConfigUtils.appId}" +
+                s"&redirect_uri=${ConfigUtils.domain}/facebook_fetch" +
+                s"&client_secret=${ConfigUtils.appSecret}" +
                 s"&code=$code")
             )
             onComplete(response) {

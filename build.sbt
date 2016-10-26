@@ -25,3 +25,4 @@ libraryDependencies ++= {
 }
 
 Revolver.settings
+Twirl.settings
