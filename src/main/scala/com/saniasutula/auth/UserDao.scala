@@ -7,12 +7,12 @@ import com.mongodb.casbah.query.Imports._
 import scala.concurrent.{ExecutionContext, Future}
 
 object UserDao {
-  val collection = Mongo.collection
+  val collection = Mongo.userDb
 
   def createUser(email: String, password: String)(implicit ec: ExecutionContext): Future[User] = {
     Future {
       val newUser = User(email).withPassword(password)
-      val result = Mongo.collection.insert(
+      val result = Mongo.userDb.insert(
         MongoDBObject(
           "email" -> newUser.email,
           "password" -> newUser.hashedPassword.get
@@ -33,7 +33,15 @@ object UserDao {
       u <- userEntity
       email <- u.getAs[String]("email")
       password = u.getAs[String]("password")
-      topWords = u.getAs[List[String]]("top_words")
+      topWords = u.getAs[List[String]]("topWords")
     } yield User(email, password, topWords)
+  }
+
+  def userInsertWords(email: String, topWords: Array[String])
+                     (implicit ec: ExecutionContext): Option[User] = {
+    val query = MongoDBObject("email" -> email)
+    val update = $set("topWords" -> topWords)
+    collection.update(query, update)
+    getUser(email)
   }
 }

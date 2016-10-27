@@ -3,8 +3,12 @@ package com.saniasutula
 import com.typesafe.config.ConfigFactory
 
 object ConfigUtils {
-  val config    = ConfigFactory.load().getConfig("facebook")
-  val domain    = config.getString("domain")
-  val appId     = config.getString("appId")
-  val appSecret = config.getString("appSecret")
+  val facebookConfig  = ConfigFactory.load().getConfig("facebook")
+  val domain          = facebookConfig.getString("domain")
+  val appId           = facebookConfig.getString("appId")
+  val appSecret       = facebookConfig.getString("appSecret")
+
+  val mailConfig      = ConfigFactory.load().getConfig("mail")
+  val senderMail      = mailConfig.getString("senderMail")
+  val senderPassword  = mailConfig.getString("senderPassword")
 }
