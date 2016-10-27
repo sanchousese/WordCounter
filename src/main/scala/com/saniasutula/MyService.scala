@@ -6,6 +6,7 @@ import spray.http.MediaTypes._
 import spray.http.{HttpRequest, HttpResponse, StatusCodes}
 import spray.routing.HttpService
 import spray.client.pipelining._
+import spray.http.HttpHeaders.RawHeader
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -39,8 +40,10 @@ trait MyService extends HttpService with Authenticator {
       }
     } ~ path("secured") {
       get {
-        authenticate(basicUserAuthenticator) { userInfo =>
-          complete(s"The user is '${userInfo.user.email}'")
+        respondWithMediaType(`application/json`) {
+          authenticate(basicUserAuthenticator) { userInfo =>
+            complete("{\"email\": \"" + userInfo.user.email + "\"}")
+          }
         }
       }
     } ~ path("users") {
@@ -58,8 +61,19 @@ trait MyService extends HttpService with Authenticator {
             }
           }
         }
-      } ~ get {
-        complete(s"${Mongo.collection.find().toList.mkString("\n\n")}")
+      }
+    } ~ path("user_page") {
+      respondWithMediaType(`text/html`) {
+        authenticate(basicUserAuthenticator) { userInfo =>
+          complete(
+            com.saniasutula.html.userPage.render(
+              userInfo.user.email,
+              userInfo.user.topWords.getOrElse(Nil),
+              s"https://www.facebook.com/dialog/oauth?client_id=${ConfigUtils.appId}" +
+                s"&redirect_uri=${ConfigUtils.domain}/facebook_fetch"
+            ).toString
+          )
+        }
       }
     } ~ path("facebook_fetch") {
       get {
@@ -78,7 +92,7 @@ trait MyService extends HttpService with Authenticator {
                 val accessTokenString: Option[String] = response.entity.data.asString
                   .split("&")
                   .find(_.contains("access_token"))
-                complete(s"${response.entity.data.asString}\n\n${accessTokenString.get}")
+                complete(s"${response.entity.data.asString}\n\n${accessTokenString.getOrElse("")}")
               case Failure(e: Throwable) =>
                 complete(StatusCodes.InternalServerError, e.getMessage)
             }
