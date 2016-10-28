@@ -1,7 +1,7 @@
 package com.saniasutula
 
 import akka.actor.ActorRefFactory
-import com.saniasutula.PostResponseJsonProtocol._
+import com.saniasutula.models.{Post, PostResponse, PostResponseJsonProtocol}
 import org.apache.spark.rdd.RDD
 import spray.client.pipelining._
 import spray.http.{HttpRequest, HttpResponse}

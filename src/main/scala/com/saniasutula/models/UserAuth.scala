@@ -1,4 +1,4 @@
-package com.saniasutula.auth
+package com.saniasutula.models
 
 import com.github.t3hnar.bcrypt._
 import org.mindrot.jbcrypt.BCrypt

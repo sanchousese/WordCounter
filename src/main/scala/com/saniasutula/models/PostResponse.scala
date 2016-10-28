@@ -1,4 +1,5 @@
-package com.saniasutula
+package com.saniasutula.models
+
 import spray.json._
 
 case class Post(id: String, message: Option[String])

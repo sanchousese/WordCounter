@@ -1,5 +1,6 @@
 package com.saniasutula.auth
 
+import com.saniasutula.models.AuthInfo
 import spray.routing.authentication.{BasicAuth, UserPass}
 import spray.routing.directives.AuthMagnet
 

@@ -1,4 +1,4 @@
-package com.saniasutula
+package com.saniasutula.utils
 
 import com.typesafe.config.ConfigFactory
 

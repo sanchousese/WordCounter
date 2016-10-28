@@ -1,9 +1,13 @@
-package com.saniasutula
+package com.saniasutula.utils
+
+import java.util._
 import javax.mail._
 import javax.mail.internet._
-import java.util._
-import scala.concurrent.duration._
+
+import com.saniasutula.Boot
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 object GmailSender {
   def installRegularlyMail(email: String) {

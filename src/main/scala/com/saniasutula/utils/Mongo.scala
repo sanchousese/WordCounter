@@ -1,4 +1,4 @@
-package com.saniasutula
+package com.saniasutula.utils
 
 import com.mongodb.casbah.Imports._
 

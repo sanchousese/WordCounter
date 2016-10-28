@@ -1,10 +1,12 @@
 package com.saniasutula
 
 import akka.actor.{Actor, ActorRefFactory}
-import com.saniasutula.auth.{Authenticator, User, UserDao}
+import com.saniasutula.auth.{Authenticator, UserDao}
 import spray.client.pipelining._
 import spray.http.MediaTypes._
 import com.github.nscala_time.time.Imports._
+import com.saniasutula.models.User
+import com.saniasutula.utils.{ConfigUtils, GmailSender}
 import spray.http.{HttpRequest, HttpResponse, StatusCodes}
 import spray.routing.HttpService
 

@@ -1,9 +1,10 @@
 package com.saniasutula.auth
 
 import com.mongodb.casbah.commons.MongoDBObject
-import com.saniasutula.Mongo
-
 import com.mongodb.casbah.query.Imports._
+import com.saniasutula.models.User
+import com.saniasutula.utils.Mongo
+
 import scala.concurrent.{ExecutionContext, Future}
 
 object UserDao {
